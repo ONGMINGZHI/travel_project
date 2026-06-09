@@ -1,8 +1,8 @@
 <?php
 require('header.php');
 
-if (isset($_GET['user_id'])) {
-    $user_id = $_GET['user_id'];
+if (isset($_GET['id'])) {
+    $user_id = $_GET['id'];
 
     $query = "SELECT * FROM users WHERE user_id=:user_id";
     $stmt = $db->prepare($query);
@@ -17,7 +17,7 @@ if(isset($_POST['username']) && isset($_POST['email']) && isset($_POST['role']) 
     $username = $_POST['username'];
     $email = $_POST['email'];
     $role = $_POST['role'];
-    $user_id = $_POST['user_id'];}
+    $user_id = $_POST['user_id'];
 
         $updateQuery = "UPDATE users SET username=:username, email=:email, role=:role WHERE user_id=:user_id";
         $stmt = $db->prepare($updateQuery);
@@ -28,14 +28,15 @@ if(isset($_POST['username']) && isset($_POST['email']) && isset($_POST['role']) 
             ':user_id' => $user_id
         ]);
 
-    header("Location:users-edit.php");
+    header("Location:users.php");
     exit;
+}
 ?>
   
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Simple CMS</title>
+    <title>Update Users</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
       rel="stylesheet"

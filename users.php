@@ -1,21 +1,29 @@
 <?php
-require('header.php');
- $query = "SELECT * FROM users WHERE deleted_at IS NULL ORDER BY user_id DESC";
-        $stmt = $db->prepare($query);
-        $stmt->execute([]);
-        $users = $stmt->fetchAll();
+require 'header.php';
 
- $deleteQuery = "UPDATE users SET deleted_at=:deleted_at WHERE user_id=:user_id";
-        $user_id = isset($_POST['user_id']) ? $_POST['user_id'] : null;
-        $stmt = $db->prepare($deleteQuery);
-        $stmt->execute([
-            ':deleted_at' => date("Y-m-d H:i:s"),
-            ':user_id' => $user_id
-        ]);
+if (strtolower($_SESSION['user']['role']) !== 'admin') {
+    header("Location: index.php");
+    exit();
+}
 
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $user_id = (int)$_GET['id'];
+    
+    $deleteQuery = "UPDATE users SET deleted_at = :deleted_at WHERE user_id = :user_id";
+    $stmt = $db->prepare($deleteQuery); 
+    $stmt->execute([
+        ':deleted_at' => date("Y-m-d H:i:s"),
+        ':user_id' => $user_id
+    ]);
+    
     header('Location: users.php');
-    exit;
+    exit();
+}
 
+$query = "SELECT * FROM users WHERE deleted_at IS NULL ORDER BY user_id ASC";
+$stmt = $db->prepare($query);
+$stmt->execute();
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html>

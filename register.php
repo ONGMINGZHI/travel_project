@@ -53,7 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <h1 class="h1 mb-4 text-center">Sign Up a New Account</h1>
 
       <div class="card p-4">
-        <form method="POST" action="register.php">
+  <?php if (!empty($error_message)): ?>
+      <div class="alert alert-danger text-center py-2 mb-3 small">
+          <?php echo htmlspecialchars($error_message); ?>
+      </div>
+  <?php endif; ?>
+  
+  <form method="POST" action="register.php">
           <div class="mb-3">
             <label for="username" class="form-label">Username</label>
             <input type="text" class="form-control" id="username" name="username" required />

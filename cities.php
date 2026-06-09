@@ -1,10 +1,11 @@
 <?php
 require('header.php');
 
-// 1. Get the country ID from the URL safely, defaulting to 0 if not present
-$country_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    die("Missing country ID in URL");
+}
 
-// 2. Fetch the country details first to verify it exists
+$country_id = (int)$_GET['id'];
 $country_stmt = $db->prepare("SELECT * FROM countries WHERE country_id = ?");
 $country_stmt->execute([$country_id]);
 $country = $country_stmt->fetch(PDO::FETCH_ASSOC);
@@ -13,14 +14,15 @@ if (!$country) {
     die("Country not found.");
 }
 
-// 3. Fetch ONLY the cities matching this country ID (No JOIN needed here since hotels are on the next page!)
 $city_stmt = $db->prepare("
     SELECT * FROM cities 
     WHERE country_id = ? 
     ORDER BY city_name ASC
 ");
+
 $city_stmt->execute([$country_id]);
 $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +31,7 @@ $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cities in <?php echo htmlspecialchars($country['country_name']); ?></title>
-    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
@@ -55,6 +57,9 @@ $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container">
         <h1>Cities in <?php echo htmlspecialchars($country['country_name']); ?></h1>
         <p>Explore local destinations and top-rated accommodations</p>
+        <?php if (strtolower($_SESSION['user']['role']) === 'admin'): ?>
+        <a href="cities-add.php" class="btn btn-warning btn-sm mt-2">Add Cities</a>
+        <?php endif; ?>
         <a href="countries.php" class="btn btn-outline-light btn-sm mt-2">← Back to Countries</a>
     </div>
 </div>
@@ -77,32 +82,32 @@ $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <strong>Population:</strong> <?php echo htmlspecialchars($city['population']); ?> <br>
                                 <strong>Famous For:</strong> <?php echo htmlspecialchars($city['famous_for']); ?>
                             </p>
-                            
-                            <a href="hotels.php?id=<?php echo $city['city_id']; ?>" class="btn btn-success btn-sm w-100 mt-auto">
+                        </div>
+                        <div class="card-footer bg-white">
+                            <a href="hotels.php?id=<?php echo $city['city_id']; ?>" class="btn btn-success btn-sm w-100 mb-2">
                                 View Hotels
                             </a>
-
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    City added: <?php echo date('d M Y', strtotime($city['created_at'])); ?>
+                                </small>
+                                <?php if (strtolower($_SESSION['user']['role']) === 'admin'): ?>
+                                    <a href="cities-edit.php?id=<?= $city['city_id'] ?>"
+                                    class="btn btn-info btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        
-                        <div class="card-footer bg-light border-0">
-                            <small class="text-muted" style="font-size: 0.75rem;">
-                                City added: <?php echo date('d M Y', strtotime($city['created_at'])); ?>
-                            </small>
-                        </div>
-                    </div>
-                </div>
-
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="col-12">
-                <div class="alert alert-info text-center">
-                    No cities found for <strong><?php echo htmlspecialchars($country['country_name']); ?></strong>.
+                            <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="col-12">
+                                    <div class="alert alert-info text-center">
+                                        No cities found for <strong><?php echo htmlspecialchars($country['country_name']); ?></strong>.
+                                    </div>
+                                </div>
+                            <?php endif; ?>
                 </div>
             </div>
-        <?php endif; ?>
-
-    </div>
-</div>
-
 </body>
 </html>

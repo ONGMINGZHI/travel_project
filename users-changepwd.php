@@ -1,12 +1,12 @@
 <?php
 require("header.php");
 
-if(!isset($_GET['user_id'])){
+if(!isset($_GET['id'])){
     header("Location: users.php");
     exit;
 }
 
-$user_id = $_GET['user_id'];
+$user_id = $_GET['id'];
 
 if(isset($_POST['password']) && isset($_POST['confirm_password']) && isset($_POST['user_id'])){
 
@@ -17,7 +17,7 @@ if(isset($_POST['password']) && isset($_POST['confirm_password']) && isset($_POS
     // Check if passwords match
     if($password == $confirm_password){
         $updateQuery = "UPDATE users SET password=:password WHERE user_id=:user_id";
-        $stmt = $db->prepare($updatequery);
+        $stmt = $db->prepare($updateQuery);
         $stmt->execute([
             ":password" => password_hash($password, PASSWORD_BCRYPT),
             ":user_id" => $user_id
@@ -26,6 +26,7 @@ if(isset($_POST['password']) && isset($_POST['confirm_password']) && isset($_POS
         exit;    
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +42,7 @@ if(isset($_POST['password']) && isset($_POST['confirm_password']) && isset($_POS
 
 <body>
 
-<div class="container mx-auto my-5" style="max-wuser_idth:700px;">
+<div class="container mx-auto my-5" style="max-width:700px;">
 
     <h1 class="mb-4">Change Password</h1>
 
@@ -73,10 +74,10 @@ if(isset($_POST['password']) && isset($_POST['confirm_password']) && isset($_POS
                 >
             </div>
 
-            <input type="hidden" name="id" value="<?= $user_id ?>">
+            <input type="hidden" name="user_id" value="<?= $user_id ?>">
 
             <div class="d-gruser_id">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to change your password?')">
                     Change Password
                 </button>
             </div>
