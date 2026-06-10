@@ -22,7 +22,6 @@ $city_stmt = $db->prepare("
 
 $city_stmt->execute([$country_id]);
 $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +30,7 @@ $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cities in <?php echo htmlspecialchars($country['country_name']); ?></title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
@@ -57,9 +56,11 @@ $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container">
         <h1>Cities in <?php echo htmlspecialchars($country['country_name']); ?></h1>
         <p>Explore local destinations and top-rated accommodations</p>
-        <?php if (strtolower($_SESSION['user']['role']) === 'admin'): ?>
-        <a href="cities-add.php" class="btn btn-warning btn-sm mt-2">Add Cities</a>
-        <?php endif; ?>
+        <?php if (isset($_SESSION['user']['role']) && strtolower($_SESSION['user']['role']) === 'admin'): ?>
+            <a href="cities-add.php?id=<?= $country_id ?>" class="btn btn-warning btn-sm mt-2">
+                Add City
+            </a>       
+         <?php endif; ?>
         <a href="countries.php" class="btn btn-outline-light btn-sm mt-2">← Back to Countries</a>
     </div>
 </div>
@@ -69,45 +70,50 @@ $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <?php if(count($cities) > 0): ?>
             <?php foreach($cities as $city): ?>
-
                 <div class="col-md-6 col-lg-4">
                     <div class="card card-city shadow-sm h-100">
                         <div class="card-body d-flex flex-column">
-                            
                             <h4 class="card-title text-success mb-3">
                                 <?php echo htmlspecialchars($city['city_name']); ?>
                             </h4>
-                            
                             <p class="card-text mb-4" style="font-size: 0.9rem;">
                                 <strong>Population:</strong> <?php echo htmlspecialchars($city['population']); ?> <br>
                                 <strong>Famous For:</strong> <?php echo htmlspecialchars($city['famous_for']); ?>
                             </p>
                         </div>
                         <div class="card-footer bg-white">
-                            <a href="hotels.php?id=<?php echo $city['city_id']; ?>" class="btn btn-success btn-sm w-100 mb-2">
-                                View Hotels
-                            </a>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted" style="font-size: 0.75rem;">
-                                    City added: <?php echo date('d M Y', strtotime($city['created_at'])); ?>
-                                </small>
-                                <?php if (strtolower($_SESSION['user']['role']) === 'admin'): ?>
-                                    <a href="cities-edit.php?id=<?= $city['city_id'] ?>"
-                                    class="btn btn-info btn-sm">
+                        <a href="hotels.php?id=<?php echo $city['city_id']; ?>" class="btn btn-success btn-sm w-100 mb-2">
+                            View Hotels
+                        </a>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Created:
+                                <?php
+                                    if (!empty($city['created_at']) && $city['created_at'] !== '0000-00-00 00:00:00' && strtotime($city['created_at']) > 0) {
+                                        echo date('d M Y', strtotime($city['created_at']));
+                                    } else {
+                                        echo 'N/A';
+                                    }
+                                ?>
+                            </small>
+                            <?php if (isset($_SESSION['user']['role']) && strtolower($_SESSION['user']['role']) === 'admin'): ?>
+                                <a href="cities-edit.php?id=<?= $city['city_id'] ?>" class="btn btn-info btn-sm">
                                     <i class="bi bi-pencil"></i>
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                            <?php endforeach; ?>
-                            <?php else: ?>
-                                <div class="col-12">
-                                    <div class="alert alert-info text-center">
-                                        No cities found for <strong><?php echo htmlspecialchars($country['country_name']); ?></strong>.
-                                    </div>
-                                </div>
+                                </a>
                             <?php endif; ?>
+                        </div>
+                    </div>
+                    </div>
+                </div> <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    No cities found for <strong><?php echo htmlspecialchars($country['country_name']); ?></strong>.
                 </div>
             </div>
+        <?php endif; ?>
+
+    </div>
+</div>
 </body>
 </html>

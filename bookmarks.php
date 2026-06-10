@@ -1,27 +1,26 @@
 <?php
 require('header.php');
 
-// 1. Simulating the logged-in user ID (Replace with your actual session variable)
-$current_user_id = 1; 
+if (!isset($_SESSION['user']['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 
-// 2. Fetch bookmarked hotels along with their City and Country details using INNER JOINs
-$query = "
-    SELECT 
-        b.bookmark_id, b.created_at AS bookmarked_at,
-        h.hotel_id, h.hotel_name, h.star_ranking, h.price_per_night, h.address,
-        c.city_name,
-        co.country_name
-    FROM bookmarks b
-    INNER JOIN hotels h ON b.hotel_id = h.hotel_id
-    INNER JOIN cities c ON h.city_id = c.city_id
-    INNER JOIN countries co ON c.country_id = co.country_id
-    WHERE b.user_id = ?
-    ORDER BY b.created_at DESC
-";
+$user_id = (int)$_SESSION['user']['user_id'];
 
-$stmt = $db->prepare($query);
-$stmt->execute([$current_user_id]);
-$bookmarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $db->prepare("
+        SELECT hotels.*, bookmarks.bookmark_id, bookmarks.created_at AS bookmarked_at 
+        FROM hotels 
+        INNER JOIN bookmarks ON hotels.hotel_id = bookmarks.hotel_id 
+        WHERE bookmarks.user_id = ?
+        ORDER BY bookmarks.created_at DESC
+    ");
+    $stmt->execute([$user_id]);
+    $bookmarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Error fetching bookmarks: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -29,27 +28,15 @@ $bookmarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Saved Bookmarks</title>
-    
+    <title>My Bookmarked Places</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
     <style>
-        .card-bookmark {
-            transition: 0.3s;
-            height: 100%;
-        }
-        .card-bookmark:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        }
         .page-header {
-            background: linear-gradient(135deg, #e06377, #f3a6b4); /* Pink/Rose theme for favorites/bookmarks */
-            color: white;
-            padding: 50px 0;
+            background: linear-gradient(135deg, #6c757d, #e9ecef);
+            color: #212529;
+            padding: 40px 0;
             margin-bottom: 30px;
-        }
-        .stars {
-            color: #ffc107;
         }
     </style>
 </head>
@@ -57,80 +44,53 @@ $bookmarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="page-header text-center">
     <div class="container">
-        <h1>My Saved Hotels</h1>
-        <p>Your personalized travel shortlist</p>
-        <a href="countries.php" class="btn btn-outline-light btn-sm mt-2">Browse More Countries</a>
+        <h1><i class="bi bi-bookmark-heart-fill text-danger"></i> My Saved Accommodations</h1>
+        <a href="index.php" class="btn btn-sm btn-outline-dark mt-2">← Back to Main Menu</a>
     </div>
 </div>
 
 <div class="container mb-5">
+
+    <?php if (isset($_GET['status']) && $_GET['status'] === 'removed'): ?>
+        <div class="alert alert-success alert-dismissible fade show text-center mb-4" role="alert">
+            <i class="bi bi-check-circle-fill"></i> Bookmark removed successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="row g-4">
-
-        <?php if(count($bookmarks) > 0): ?>
-            <?php foreach($bookmarks as $bookmark): ?>
-
+        <?php if (count($bookmarks) > 0): ?>
+            <?php foreach ($bookmarks as $hotel): ?>
                 <div class="col-md-6 col-lg-4">
-                    <div class="card card-bookmark shadow-sm h-100">
-                        <div class="card-body d-flex flex-column">
-                            
-                            <div class="mb-2">
-                                <span class="badge bg-secondary">
-                                    <?php echo htmlspecialchars($bookmark['country_name']); ?>
-                                </span>
-                                <span class="badge bg-success">
-                                    <?php echo htmlspecialchars($bookmark['city_name']); ?>
-                                </span>
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark"><?= htmlspecialchars($hotel['hotel_name']) ?></h5>
+                            <p class="card-text text-muted small"><i class="bi bi-geo-alt"></i> <?= htmlspecialchars($hotel['address']) ?></p>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-secondary small">Price</span>
+                                <span class="fs-5 fw-bold text-success">$<?= number_format($hotel['price_per_night']) ?>/night</span>
                             </div>
-
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title text-dark mb-0">
-                                    <?php echo htmlspecialchars($bookmark['hotel_name']); ?>
-                                </h5>
-                                <span class="stars">
-                                    <?php echo str_repeat('★', $bookmark['star_ranking']); ?>
-                                </span>
-                            </div>
-                            
-                            <p class="card-text text-muted small mb-4">
-                                <?php echo htmlspecialchars($bookmark['address']); ?>
-                            </p>
-                            
-                            <div class="mt-auto">
-                                <hr>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <small class="text-muted d-block">Price per night</small>
-                                        <span class="fs-5 fw-bold text-success">$<?php echo number_format($bookmark['price_per_night']); ?></span>
-                                    </div>
-                                    <a href="hotels.php?id=<?php echo $bookmark['hotel_id']; ?>" class="btn btn-sm btn-outline-danger">
-                                        View Deal
-                                    </a>
-                                </div>
-                            </div>
-
                         </div>
-                        
-                        <div class="card-footer bg-light border-0">
-                            <small class="text-muted" style="font-size: 0.75rem;">
-                                Saved on: <?php echo date('d M Y', strtotime($bookmark['bookmarked_at'])); ?>
-                            </small>
+                        <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center pb-3">
+                            <small class="text-muted" style="font-size:0.7rem">Saved: <?= date('d M Y', strtotime($hotel['bookmarked_at'])) ?></small>
+                            
+                            <a href="bookmarks-edit.php?id=<?= $hotel['bookmark_id'] ?>" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Remove
+                            </a>
                         </div>
                     </div>
                 </div>
-
             <?php endforeach; ?>
         <?php else: ?>
-            <div class="col-12 text-center py-5">
-                <div class="alert alert-light border shadow-sm p-4 inline-block" style="max-width: 500px; margin: 0 auto;">
-                    <h4 class="text-muted">No bookmarks found</h4>
-                    <p class="text-muted small">You haven't saved any hotels to your list yet.</p>
-                    <a href="countries.php" class="btn btn-danger btn-sm mt-2">Explore Destinations</a>
-                </div>
+            <div class="col-12 text-center my-5">
+                <i class="bi bi-bookmark text-muted" style="font-size: 3rem;"></i>
+                <p class="mt-3 text-muted">You haven't saved any hotels to your lists yet.</p>
             </div>
         <?php endif; ?>
-
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

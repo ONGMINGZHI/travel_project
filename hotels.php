@@ -1,20 +1,16 @@
 <?php
 require('header.php');
 
-// 1. Get the city ID from the URL safely, defaulting to 0 if not present
 $city_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// 2. Fetch the city details first to verify it exists and get its info
 $city_stmt = $db->prepare("SELECT * FROM cities WHERE city_id = ?");
 $city_stmt->execute([$city_id]);
 $city = $city_stmt->fetch(PDO::FETCH_ASSOC);
 
-// If the city doesn't exist, stop execution
 if (!$city) {
     die("City not found.");
 }
 
-// 3. Fetch ONLY the hotels that belong to this specific city
 $hotel_stmt = $db->prepare("
     SELECT hotels.*, cities.city_name 
     FROM hotels 
@@ -34,6 +30,7 @@ $hotels = $hotel_stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Hotels in <?php echo htmlspecialchars($city['city_name']); ?></title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
 
     <style>
         .card-hotel {
@@ -62,11 +59,27 @@ $hotels = $hotel_stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container">
         <h1>Hotels in <?php echo htmlspecialchars($city['city_name']); ?></h1>
         <p class="mb-2">Famous for: <em><?php echo htmlspecialchars($city['famous_for']); ?></em></p>
+        <?php if (isset($_SESSION['user']['role']) && strtolower($_SESSION['user']['role']) === 'admin'): ?>
+            <a href="hotels-add.php?id=<?= $city_id ?>" class="btn btn-warning btn-sm my-2 d-inline-block">Add Hotel</a>       
+        <?php endif; ?>
         <a href="cities.php?id=<?php echo $city['country_id']; ?>" class="btn btn-outline-dark btn-sm">← Back to Cities</a>
     </div>
 </div>
 
 <div class="container mb-5">
+
+    <?php if (isset($_GET['status']) && $_GET['status'] === 'bookmarked'): ?>
+        <div class="alert alert-success text-center alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> Hotel added to your bookmarks successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+    <?php if (isset($_GET['status']) && $_GET['status'] === 'already_bookmarked'): ?>
+    <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
+        <i class="bi bi-bookmark-check-fill"></i> You've already bookmarked this hotel.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
 
     <div class="row g-4">
 
@@ -104,14 +117,25 @@ $hotels = $hotel_stmt->fetchAll(PDO::FETCH_ASSOC);
 
                         </div>
 
-                        <div class="card-footer bg-white border-0 text-end">
+                        <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
                             <small class="text-muted" style="font-size: 0.75rem;">
-                                Registered: <?php echo date('d M Y', strtotime($hotel['created_at'])); ?>
+                                Created: <?php echo date('d M Y', strtotime($hotel['created_at'])); ?>
                             </small>
+                            <?php if (isset($_SESSION['user']['role']) && strtolower($_SESSION['user']['role']) === 'admin'): ?>
+                                <a href="hotels-edit.php?id=<?= $hotel['hotel_id'] ?>" class="btn btn-info btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            <?php else: ?>
+                                <form action="bookmarks-add.php" method="POST" class="m-0">
+                                    <input type="hidden" name="hotel_id" value="<?= $hotel['hotel_id']; ?>">
+                                    <input type="hidden" name="city_id" value="<?= $city_id; ?>">
+                                    <button type="submit" class="btn btn-outline-warning btn-sm">
+                                        <i class="bi bi-bookmark-star"></i> Bookmark
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </div>
-
                     </div>
-
                 </div>
 
             <?php endforeach; ?>
@@ -130,5 +154,6 @@ $hotels = $hotel_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

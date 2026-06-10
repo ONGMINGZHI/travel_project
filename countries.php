@@ -1,6 +1,5 @@
 <?php
 require('header.php');
-// var_dump($_GET);
 
 $stmt = $db->prepare("SELECT * FROM countries ORDER BY country_name ASC");
 $stmt->execute();
@@ -56,14 +55,13 @@ $countries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <div class="container">
-
     <div class="row g-4">
 
         <?php if(count($countries) > 0): ?>
 
             <?php foreach($countries as $country): ?>
 
-                <div class="col-md-4 col-lg-3">
+                <div class="col-md-6 col-lg-4">
 
                     <div class="card card-country">
 
