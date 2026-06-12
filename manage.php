@@ -8,112 +8,210 @@ if (!isset($_SESSION['user']) || strtolower($_SESSION['user']['role']) !== 'admi
     exit();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage - Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>Manage - Travel Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
             min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-color: #fdf6ec;
         }
 
-        .glass-card {
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.12);
-            transition: all 0.3s ease;
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(253, 246, 236, 0.80);
+            z-index: 0;
         }
 
-        .glass-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: 60px 16px 80px;
         }
 
-        .manage-btn {
-            transition: 0.3s;
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
         }
 
-        .manage-btn:hover {
-            transform: scale(1.05);
+        .header .title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #c17d3c;
+            margin-bottom: 10px;
         }
 
-        .top-glow {
-            position: absolute;
-            width: 350px;
-            height: 350px;
-            background: #3b82f6;
-            filter: blur(120px);
-            opacity: 0.25;
-            top: -100px;
-            left: -100px;
-            z-index: -1;
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            color: #2d1f0e;
+            margin-bottom: 10px;
+            line-height: 1.15;
         }
 
-        .bottom-glow {
-            position: absolute;
-            width: 350px;
-            height: 350px;
-            background: #8b5cf6;
-            filter: blur(120px);
-            opacity: 0.25;
-            bottom: -100px;
-            right: -100px;
-            z-index: -1;
+        .header p {
+            color: #7a6652;
+            font-size: 0.92rem;
         }
+
+        .nav-card {
+            background: #ffffff;
+            border: 1.5px solid #e8ddd0;
+            border-radius: 16px;
+            padding: 36px 28px;
+            text-align: center;
+            transition: transform 0.25s, box-shadow 0.25s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(193, 125, 60, 0.15);
+        }
+
+        .card-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .icon-red   { background: #fff0f0; color: #c0392b; }
+        .icon-blue  { background: #eff6ff; color: #3b7dd8; }
+
+        .nav-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: #2d1f0e;
+            margin-bottom: 8px;
+        }
+
+        .nav-card p {
+            color: #9e8a78;
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .btn-card {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.15s;
+            text-align: center;
+        }
+
+        .btn-card:hover { transform: translateY(-1px); }
+
+        .btn-red  { background: #c0392b; color: #fff; }
+        .btn-red:hover  { background: #a93226; color: #fff; }
+
+        .btn-blue { background: #3b7dd8; color: #fff; }
+        .btn-blue:hover { background: #2d6bbf; color: #fff; }
+
+        .footer { 
+            text-align: center;
+            margin:20px; 
+        }
+
+        .btn-back {
+            background: #fff;
+            border: 1.5px solid #e0d5c8;
+            color: #5a4a3a;
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 10px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+            display: inline-block;
+        }
+
+        .btn-back:hover {
+            background: #fdf0e0;
+            border-color: #c17d3c;
+            color: #c17d3c;
+        }
+
     </style>
 </head>
 <body>
 
-<div class="top-glow"></div>
-<div class="bottom-glow"></div>
+<div class="page-wrapper">
 
-<div class="container py-5">
-    <div class="text-center mb-5 relative">
-        <h1 class="display-4 fw-bold">Admin Dashboard</h1>
-        <a href="index.php" class="text-slate-400 hover:text-white transition-colors text-sm font-medium"><i class="bi bi-arrow-left"></i> Back to Main Site</a>
+    <div class="header">
+        <p class="title">Travel Explorer</p>
+        <h1>Management Dashboard</h1>
+        <p>Manage your system data and users.</p>
+
+
+    <div class="container" style="max-width: 760px;">
+        <div class="row g-4 justify-content-center">
+
+            <div class="col-12 col-sm-6">
+                <div class="nav-card">
+                    <div class="card-icon icon-red">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h3>Users</h3>
+                    <p>Add, edit, or remove user accounts and manage roles.</p>
+                    <a href="users.php" class="btn-card btn-red">Manage Users  <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6">
+                <div class="nav-card">
+                    <div class="card-icon icon-blue">
+                        <i class="bi bi-globe-americas"></i>
+                    </div>
+                    <h3>Data</h3>
+                    <p>Manage countries, cities and hotels.</p>
+                    <a href="countries.php" class="btn-card btn-blue">Manage Data  <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <div class="row g-4 justify-content-center">
-        
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="glass-card rounded-4 p-4 h-100 text-center shadow-lg flex flex-col justify-between">
-                <div>
-                    <div class="mb-4">
-                        <div class="bg-danger bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center" style="width:80px;height:80px;">
-                            <i class="bi bi-people-fill fs-1"></i>
-                        </div>
-                    </div>
-                    <h3 class="fw-bold mb-3">Users</h3>
-                    <p class="text-light opacity-75 mb-4">Manage users system settings.</p>
-                </div>
-                <a href="users.php" class="btn btn-danger w-100 rounded-pill manage-btn py-2 mt-auto">Open</a>
-            </div>
-        </div>
+    <div class="footer">
+        <a href="index.php" class="btn-back">
+            <i class="bi bi-arrow-left me-2"></i>Back to Main 
+        </a>
+    </div>
 
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="glass-card rounded-4 p-4 h-100 text-center shadow-lg flex flex-col justify-between">
-                <div>
-                    <div class="mb-4">
-                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center" style="width:80px;height:80px;">
-                            <i class="bi bi-globe-americas fs-1"></i>
-                        </div>
-                    </div>
-                    <h3 class="fw-bold mb-3">Data</h3>
-                    <p class="text-light opacity-75 mb-4">Manage countries, cities and hotels.</p>
-                </div>
-                <a href="countries.php" class="btn btn-primary w-100 rounded-pill manage-btn py-2 mt-auto">Open</a>
-            </div>
-        </div>
-
-    </div> 
 </div>
 
 </body>

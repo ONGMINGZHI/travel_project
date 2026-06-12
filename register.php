@@ -38,82 +38,253 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <title>User registered</title>
-    <style type="text/css">
-     body { background:#0b1220; color:#e2e8f0; }
-        .nav-btn { background:none; border:none; color:#94a3b8; margin-right:10px; }
-        .nav-btn.active { color:#f59e0b; border-bottom:2px solid #f59e0b; }
-     </style>
+    <title>Register - Travel Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-image: url('assets/passport.jpg');
+            background-color: rgba(255,255,255,0.6);
+            background-blend-mode: lighten;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+
+        .page-layout {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            min-height: 560px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+        }
+
+        .left-panel {
+            flex: 1;
+            background: #fdf6ec;
+            padding: 52px 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 1px solid #e8ddd0;
+        }
+
+        .left-panel .title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #c17d3c;
+            margin-bottom: 10px;
+        }
+
+        .left-panel h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #2d1f0e;
+            line-height: 1.25;
+            margin-bottom: 16px;
+        }
+
+        .left-panel p {
+            color: #7a6652;
+            font-size: 0.92rem;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+        .stamp-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .stamp {
+            border: 2px solid;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+        
+        .stamp-blue  { border-color: #3b7dd8; color: #3b7dd8; }
+        .stamp-red   { border-color: #c0392b; color: #c0392b; }
+        .stamp-green { border-color: #27804a; color: #27804a; }
+
+        .right-panel {
+            flex: 1;
+            background: #ffffff;
+            padding: 48px 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .right-panel h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #2d1f0e;
+            margin-bottom: 6px;
+        }
+
+        .right-panel .subtitle {
+            color: #9e8a78;
+            font-size: 0.85rem;
+            margin-bottom: 28px;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #5a4a3a;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            border: 1.5px solid #e0d5c8;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.92rem;
+            color: #2d1f0e;
+            background: #fdfaf7;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #c17d3c;
+            box-shadow: 0 0 0 3px rgba(193, 125, 60, 0.12);
+            background: #fff;
+            outline: none;
+        }
+
+        .form-control::placeholder { color: #c4b5a5; }
+
+        .btn-register {
+            background: #c17d3c;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 11px;
+            width: 100%;
+            margin-top: 6px;
+            transition: background 0.2s, transform 0.15s;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+        }
+
+        .btn-register:hover {
+            background: #a8682e;
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #9e8a78;
+        }
+
+        .form-footer a {
+            color: #c17d3c;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover { text-decoration: underline; }
+
+        .alert-danger {
+            background: #ffffff;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            padding: 10px 14px;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 680px) {
+            .page-layout { flex-direction: column; }
+            .left-panel { padding: 36px 28px 28px; border-right: none; border-bottom: 1px solid #e8ddd0; }
+            .right-panel { padding: 32px 28px 40px; }
+        }
+    </style>
 </head>
-<body> 
-    <div class="container my-5 mx-auto" style="max-width: 500px;">
-      <h1 class="h1 mb-4 text-center">Sign Up a New Account</h1>
+<body>
 
-      <div class="card p-4">
-  <?php if (!empty($error_message)): ?>
-      <div class="alert alert-danger text-center py-2 mb-3 small">
-          <?php echo htmlspecialchars($error_message); ?>
-      </div>
-  <?php endif; ?>
-  
-  <form method="POST" action="register.php">
-          <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" required />
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="email" name="email" required/>
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              name="password"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label for="confirm_password" class="form-label"
-              >Confirm Password</label
-            >
-            <input
-              type="password"
-              class="form-control"
-              id="confirm_password"
-              name="confirm_password"
-              required
-            />
-          </div>
-          <div class="d-grid">
-            <input type="submit" value="Sign Up"class="btn btn-primary w-100">
-          </div>
-        </form>
-      </div>
+<div class="page-layout">
 
-      <!-- links -->
-      <div
-        class="d-flex justify-content-between align-items-center gap-3 mx-auto pt-3"
-      >
-        <a href="index.php" class="text-decoration-none small"
-          ><i class="bi bi-arrow-left-circle"></i> Go back</a
-        >
-        <a href="login.php" class="text-decoration-none small"
-          >Already have an account? Login here
-          <i class="bi bi-arrow-right-circle"></i
-        ></a>
-      </div>
+    <div class="left-panel">
+        <span class="title">Travel Explorer</span>
+        <h1>Your journey starts here.</h1>
+        <p>Create a free account to bookmark hotels, explore destinations, and plan your next adventure across the world.</p>
+        <div class="stamp-row">
+            <span class="stamp stamp-blue">Admitted</span>
+            <span class="stamp stamp-red">Departed</span>
+            <span class="stamp stamp-green">Arrived</span>
+        </div>
     </div>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-      crossorigin="anonymous"
-    ></script>
-  </body>
+    <div class="right-panel">
+        <h2>Create an account</h2>
+        <p class="subtitle">Fill in your details to get started.</p>
+
+        <?php if (!empty($error_message)): ?>
+            <div class="alert-danger d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-circle-fill"></i> <?= $error_message ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" id="registerForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username"
+                    placeholder="e.g. johndoe"
+                    value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>"
+                    required />
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email"
+                    placeholder="you@example.com"
+                    value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
+                    required />
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password"
+                    placeholder="Enter your password" required />
+            </div>
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password"
+                    placeholder="Repeat your password" required />
+            </div>
+
+            <button type="submit" class="btn-register">Register  <i class="bi bi-arrow-right"></i></button>
+        </form>
+
+        <p class="form-footer">
+            Already have an account? <a href="login.php">Sign in here</a>
+        </p>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
