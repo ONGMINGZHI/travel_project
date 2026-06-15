@@ -31,8 +31,13 @@ $hotels = $hotel_stmt->fetchAll(PDO::FETCH_ASSOC);
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
+        h1{
+            font-family: 'Playfair Display', serif;
+        }
         .card-hotel {
             transition: 0.3s;
             height: 100%;
@@ -153,7 +158,5 @@ $hotels = $hotel_stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

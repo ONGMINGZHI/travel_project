@@ -32,8 +32,11 @@ $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Cities in <?php echo htmlspecialchars($country['country_name']); ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        h1{
+            font-family: 'Playfair Display', serif;
+        }
         .card-city {
             transition: 0.3s;
             height: 100%;
@@ -82,7 +85,7 @@ $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
                             </p>
                         </div>
                         <div class="card-footer bg-white">
-                        <a href="hotels.php?id=<?php echo $city['city_id']; ?>" class="btn btn-success btn-sm w-100 mb-2">
+                        <a href="hotels.php?id=<?php echo $city['city_id']; ?>" class="btn btn-warning btn-sm w-100 mb-2">
                             View Hotels
                         </a>
                         <div class="d-flex justify-content-between align-items-center">
