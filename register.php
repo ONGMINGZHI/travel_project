@@ -16,7 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
 
         $db = new PDO("mysql:host=localhost;dbname=traveldb", "root", "");
+            $check_query = "SELECT COUNT(*) FROM users WHERE username = :username";
+    $check_stmt = $db->prepare($check_query);
+    $check_stmt->execute([
+        ":username" => $username,
+    ]);
+    
+    $username_exists = $check_stmt->fetchColumn();
 
+    if ($username_exists > 0) {
+        $error_message = "The username '" . htmlspecialchars($username) . "' has already been added.";
+    } else {
         $query = "INSERT INTO users (username, email, password, role)
                   VALUES (:username, :email, :password, :role)";
 
@@ -30,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ]);
         header("Location: login.php");
         exit;
+        }
     }
 }
 ?>
@@ -104,23 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             line-height: 1.7;
             margin-bottom: 28px;
         }
-
-        .stamp-row { display: flex; gap: 10px; flex-wrap: wrap; }
-
-        .stamp {
-            border: 2px solid;
-            border-radius: 4px;
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            opacity: 0.7;
-        }
-        
-        .stamp-blue  { border-color: #3b7dd8; color: #3b7dd8; }
-        .stamp-red   { border-color: #c0392b; color: #c0392b; }
-        .stamp-green { border-color: #27804a; color: #27804a; }
 
         .right-panel {
             flex: 1;
@@ -233,11 +227,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <span class="title">Travel Explorer</span>
         <h1>Your journey starts here.</h1>
         <p>Create a free account to bookmark hotels, explore destinations, and plan your next adventure across the world.</p>
-        <div class="stamp-row">
-            <span class="stamp stamp-blue">Admitted</span>
-            <span class="stamp stamp-red">Departed</span>
-            <span class="stamp stamp-green">Arrived</span>
-        </div>
     </div>
 
     <div class="right-panel">
@@ -254,14 +243,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="username" name="username"
-                    placeholder="e.g. johndoe"
+                    placeholder="e.g. banana"
                     value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>"
                     required />
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email"
-                    placeholder="you@example.com"
+                    placeholder="banana@example.com"
                     value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
                     required />
             </div>

@@ -183,7 +183,7 @@ if (isset($_POST['username'])) {
 
         .left h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: #2d1f0e;
             line-height: 1.25;
             margin-bottom: 16px;
@@ -294,7 +294,7 @@ if (isset($_POST['username'])) {
 
     <div class=" left">
         <span class="title">Travel Explorer</span>
-        <h1>Welcome back, traveller.</h1>
+        <h1>Travel Is The Only Thing You Buy That Makes You Richer.</h1>
         <p>Sign in to pick up where you left off — your saved hotels and favourite destinations are waiting for you.</p>
     </div>
 
