@@ -213,6 +213,5 @@ if (!isset($_SESSION['user']) || strtolower($_SESSION['user']['role']) !== 'admi
     </div>
 
 </div>
-
 </body>
 </html>
